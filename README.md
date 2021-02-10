@@ -7,7 +7,7 @@ FASTQ files between lanes, then run fastqc on all merged data and compile an agg
 
 ## Authors
 
-* Hans Vasquez-Gross (@hansvg), https://hansvg.github.io
+* Hans Vasquez-Gross (@hans-vg)
 
 ## Usage
 
