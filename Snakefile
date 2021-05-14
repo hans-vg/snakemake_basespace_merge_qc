@@ -7,6 +7,7 @@ wildcard_constraints:
 
 inputdirectory=config["directory"]
 SAMPLES, LANENUMS = glob_wildcards(inputdirectory+"/{sample}_L{lanenum}_R1_001.fastq.gz", followlinks=True)
+#PROJECTDIR, LANENUM1, BSSTRINGS, SAMPLES, LANENUMS = glob_wildcards(inputdirectory+"/{proj}_L{lanenum1}_ds.{bsstring}/{sample}_L{lanenum}_R1_001.fastq.gz", followlinks=True)
 
 
 ##### target rules #####
@@ -16,6 +17,19 @@ rule all:
        expand('merged/{sample}/{sample}_R2.fastq.gz', sample=SAMPLES),
        "qc/multiqc_report_premerge.html",
        "qc/multiqc_report_postmerge.html"
+
+#normal basespace output
+#rule mergeFastqR1:
+#    input: lambda wildcards: sorted(glob.glob(inputdirectory+'/*/{sample}_L*_R1_001.fastq.gz'.format(sample=wildcards.sample)))
+#    output: "merged/{sample}/{sample}_R1.fastq.gz"
+#    shell: "cat {input} > {output}"
+#
+#rule mergeFastqR2:
+#    input: lambda wildcards: sorted(glob.glob(inputdirectory+'/*/{sample}_L*_R2_001.fastq.gz'.format(sample=wildcards.sample)))
+#    output: "merged/{sample}/{sample}_R2.fastq.gz"
+#    shell: "cat {input} > {output}"
+
+## for allens
 
 rule mergeFastqR1:
     input: lambda wildcards: sorted(glob.glob(inputdirectory+'/{sample}_L*_R1_001.fastq.gz'.format(sample=wildcards.sample)))
