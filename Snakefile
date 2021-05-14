@@ -6,8 +6,7 @@ wildcard_constraints:
    lanenum = '\d+'
 
 inputdirectory=config["directory"]
-PROJECTDIR, RANDOMINT, LANENUM1, BSSTRINGS, SAMPLES, LANENUMS = glob_wildcards(inputdirectory+"/{proj}-{randint}_L{lanenum1}_ds.{bsstring}/{sample}_L{lanenum}_R1_001.fastq.gz", followlinks=True)
-PROJECTDIR, RANDOMINT, LANENUM1, BSSTRINGS, SAMPLES, LANENUMS = glob_wildcards(inputdirectory+"/{proj}-{randint}_L{lanenum1}_ds.{bsstring}/{sample}_L{lanenum}_R2_001.fastq.gz", followlinks=True)
+SAMPLES, LANENUMS = glob_wildcards(inputdirectory+"/{sample}_L{lanenum}_R1_001.fastq.gz", followlinks=True)
 
 
 ##### target rules #####
@@ -19,46 +18,46 @@ rule all:
        "qc/multiqc_report_postmerge.html"
 
 rule mergeFastqR1:
-    input: lambda wildcards: glob.glob(inputdirectory+'/*/{sample}_L*_R1_001.fastq.gz'.format(sample=wildcards.sample))
+    input: lambda wildcards: sorted(glob.glob(inputdirectory+'/{sample}_L*_R1_001.fastq.gz'.format(sample=wildcards.sample)))
     output: "merged/{sample}/{sample}_R1.fastq.gz"
     shell: "cat {input} > {output}"
 
 rule mergeFastqR2:
-    input: lambda wildcards: glob.glob(inputdirectory+'/*/{sample}_L*_R2_001.fastq.gz'.format(sample=wildcards.sample))
+    input: lambda wildcards: sorted(glob.glob(inputdirectory+'/{sample}_L*_R2_001.fastq.gz'.format(sample=wildcards.sample)))
     output: "merged/{sample}/{sample}_R2.fastq.gz"
     shell: "cat {input} > {output}"
 
 
 rule fastqc_premerge_r1:
     input:
-        f"{config['directory']}/{{proj}}-{{randint}}_L{{lanenum1}}_ds.{{bsstring}}/{{sample}}_L{{lanenum}}_R1_001.fastq.gz"
+        f"{config['directory']}/{{sample}}_L{{lanenum}}_R1_001.fastq.gz"
     output:
-        html="qc/fastqc_premerge/{sample}_L{lanenum}_{proj}-{randint}_L{lanenum1}_ds.{bsstring}_r1.html",
-        zip="qc/fastqc_premerge/{sample}_L{lanenum}_{proj}-{randint}_L{lanenum1}_ds.{bsstring}_r1_fastqc.zip" # the suffix _fastqc.zip is necessary for multiqc 
+        html="qc/fastqc_premerge/{sample}_L{lanenum}_r1.html",
+        zip="qc/fastqc_premerge/{sample}_L{lanenum}_r1_fastqc.zip" # the suffix _fastqc.zip is necessary for multiqc 
     params: ""
     log:
-        "logs/fastqc_premerge/{sample}_L{lanenum}_{proj}-{randint}_L{lanenum1}_ds.{bsstring}_r1.log"
+        "logs/fastqc_premerge/{sample}_L{lanenum}_r1.log"
     threads: 1
     wrapper:
         "v0.69.0/bio/fastqc"
 
 rule fastqc_premerge_r2:
     input:
-        f"{config['directory']}/{{proj}}-{{randint}}_L{{lanenum1}}_ds.{{bsstring}}/{{sample}}_L{{lanenum}}_R2_001.fastq.gz"
+        f"{config['directory']}/{{sample}}_L{{lanenum}}_R2_001.fastq.gz"
     output:
-        html="qc/fastqc_premerge/{sample}_L{lanenum}_{proj}-{randint}_L{lanenum1}_ds.{bsstring}_r2.html",
-        zip="qc/fastqc_premerge/{sample}_L{lanenum}_{proj}-{randint}_L{lanenum1}_ds.{bsstring}_r2_fastqc.zip" # the suffix _fastqc.zip is necessary for multiqc 
+        html="qc/fastqc_premerge/{sample}_L{lanenum}_r2.html",
+        zip="qc/fastqc_premerge/{sample}_L{lanenum}_r2_fastqc.zip" # the suffix _fastqc.zip is necessary for multiqc 
     params: ""
     log:
-        "logs/fastqc_premerge/{sample}_L{lanenum}_{proj}-{randint}_L{lanenum1}_ds.{bsstring}_r2.log"
+        "logs/fastqc_premerge/{sample}_L{lanenum}_r2.log"
     threads: 1
     wrapper:
         "v0.69.0/bio/fastqc"
 
 rule multiqc_pre:
     input:
-        expand("qc/fastqc_premerge/{sample}_L{lanenum}_{proj}-{randint}_L{lanenum1}_ds.{bsstring}_r1_fastqc.zip", zip, sample=SAMPLES, lanenum=LANENUMS, proj=PROJECTDIR, randint=RANDOMINT, lanenum1=LANENUM1, bsstring=BSSTRINGS),
-        expand("qc/fastqc_premerge/{sample}_L{lanenum}_{proj}-{randint}_L{lanenum1}_ds.{bsstring}_r2_fastqc.zip", zip, sample=SAMPLES, lanenum=LANENUMS, proj=PROJECTDIR, randint=RANDOMINT, lanenum1=LANENUM1, bsstring=BSSTRINGS)
+        expand("qc/fastqc_premerge/{sample}_L{lanenum}_r1_fastqc.zip", zip, sample=SAMPLES, lanenum=LANENUMS),
+        expand("qc/fastqc_premerge/{sample}_L{lanenum}_r2_fastqc.zip", zip, sample=SAMPLES, lanenum=LANENUMS)
     output:
         "qc/multiqc_report_premerge.html"
     log:
