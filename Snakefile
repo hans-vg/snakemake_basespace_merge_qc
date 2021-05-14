@@ -28,6 +28,44 @@ rule all:
 #    input: lambda wildcards: sorted(glob.glob(inputdirectory+'/*/{sample}_L*_R2_001.fastq.gz'.format(sample=wildcards.sample)))
 #    output: "merged/{sample}/{sample}_R2.fastq.gz"
 #    shell: "cat {input} > {output}"
+#rule fastqc_premerge_r1:
+#    input:
+#        f"{config['directory']}/{{proj}}_L{{lanenum1}}_ds.{{bsstring}}/{{sample}}_L{{lanenum}}_R1_001.fastq.gz"
+#    output:
+#        html="qc/fastqc_premerge/{sample}_L{lanenum}_{proj}_L{lanenum1}_ds.{bsstring}_r1.html",
+#        zip="qc/fastqc_premerge/{sample}_L{lanenum}_{proj}_L{lanenum1}_ds.{bsstring}_r1_fastqc.zip" # the suffix _fastqc.zip is necessary for multiqc 
+#    params: ""
+#    log:
+#        "logs/fastqc_premerge/{sample}_L{lanenum}_{proj}_L{lanenum1}_ds.{bsstring}_r1.log"
+#    threads: 1
+#    wrapper:
+#        "v0.69.0/bio/fastqc"
+#
+#rule fastqc_premerge_r2:
+#    input:
+#        f"{config['directory']}/{{proj}}_L{{lanenum1}}_ds.{{bsstring}}/{{sample}}_L{{lanenum}}_R2_001.fastq.gz"
+#    output:
+#        html="qc/fastqc_premerge/{sample}_L{lanenum}_{proj}_L{lanenum1}_ds.{bsstring}_r2.html",
+#        zip="qc/fastqc_premerge/{sample}_L{lanenum}_{proj}_L{lanenum1}_ds.{bsstring}_r2_fastqc.zip" # the suffix _fastqc.zip is necessary for multiqc 
+#    params: ""
+#    log:
+#        "logs/fastqc_premerge/{sample}_L{lanenum}_{proj}_L{lanenum1}_ds.{bsstring}_r2.log"
+#    threads: 1
+#    wrapper:
+#        "v0.69.0/bio/fastqc"
+#rule multiqc_pre:
+#    input:
+#        expand("qc/fastqc_premerge/{sample}_L{lanenum}_{proj}_L{lanenum1}_ds.{bsstring}_r1_fastqc.zip", zip, sample=SAMPLES, lanenum=LANENUMS, proj=PROJECTDIR, lanenum1=LANENUM1, bsstring=BSSTRINGS),
+#        expand("qc/fastqc_premerge/{sample}_L{lanenum}_{proj}_L{lanenum1}_ds.{bsstring}_r2_fastqc.zip", zip, sample=SAMPLES, lanenum=LANENUMS, proj=PROJECTDIR, lanenum1=LANENUM1, bsstring=BSSTRINGS)
+#    output:
+#        "qc/multiqc_report_premerge.html"
+#    log:
+#        "logs/multiqc_premerge.log"
+#    wrapper:
+#        "0.62.0/bio/multiqc"
+
+
+
 
 ## for allens
 
